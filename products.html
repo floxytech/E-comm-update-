@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Products - Caperone</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="page-products">
+
+  <div class="container">
+    <header class="header">
+      <div class="brand">
+        <div class="logo">C</div>
+        <a href="index.html" class="site-title">Caperone</a>
+      </div>
+      <nav class="nav">
+        <a href="index.html">Home</a>
+        <a href="order.html">Order</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+      <div class="user-actions">
+      </div>
+    </header>
+
+    <section class="product-listing">
+      <h1>Our Products</h1>
+      <div class="filters">
+        <div class="filter-group">
+          <label for="sort">Sort by:</label>
+          <select id="sort">
+            <option value="default">Default</option>
+            <option value="price-asc">Price: Low to High</option>
+            <option value="price-desc">Price: High to Low</option>
+            <option value="rating-desc">Rating: High to Low</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Category:</label>
+          <div class="checkbox-group" id="category-filter">
+          </div>
+        </div>
+        <div class="filter-group">
+          <label>Brand:</label>
+          <div class="checkbox-group" id="brand-filter">
+          </div>
+        </div>
+      </div>
+
+      <div class="grid"></div>
+    </section>
+  </div>
+
+  <footer class="site-footer">
+    <div>&copy; 2025 Caperone. All Rights Reserved.</div>
+    <div class="links">
+      <a href="index.html">Home</a>
+      <a href="contact.html">Contact</a>
+    </div>
+  </footer>
+
+  <script src="cart.js"></script>
+  <script src="user.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const userActions = document.querySelector('.user-actions');
+      const currentUser = window.user.getCurrentUser();
+
+      if (currentUser) {
+        userActions.innerHTML = `
+          <span>Welcome, ${currentUser.name}</span>
+          <a href="profile.html">Profile</a>
+          <a href="#" id="logout">Log Out</a>
+        `;
+        document.getElementById('logout').addEventListener('click', () => {
+          window.user.logout();
+          window.location.reload();
+        });
+      } else {
+        userActions.innerHTML = `
+          <a href="login.html" class="btn ghost">Log In</a>
+          <a href="signup.html" class="btn primary">Sign Up</a>
+        `;
+      }
+
+      const productGrid = document.querySelector('.grid');
+      const sortSelect = document.getElementById('sort');
+      const categoryFilter = document.getElementById('category-filter');
+      const brandFilter = document.getElementById('brand-filter');
+
+      let filteredProducts = [...products];
+
+      function renderProducts() {
+        productGrid.innerHTML = '';
+        filteredProducts.forEach(product => {
+          const card = document.createElement('div');
+          card.classList.add('card');
+          card.dataset.id = product.id;
+          card.innerHTML = `
+            <a href="product-details.html?id=${product.id}">
+              <img src="${product.image}" alt="${product.name}" />
+            </a>
+            <div class="title">${product.name}</div>
+            <div class="price">$${product.price.toFixed(2)}</div>
+            <div class="meta">
+              <a href="product-details.html?id=${product.id}" class="btn ghost">Quick View</a>
+              <button class="btn primary add-to-cart">Add to Cart</button>
+            </div>
+          `;
+          productGrid.appendChild(card);
+        });
+
+        const addToCartButtons = document.querySelectorAll('.add-to-cart');
+        addToCartButtons.forEach(button => {
+          button.addEventListener('click', () => {
+            const card = button.closest('.card');
+            const productId = parseInt(card.dataset.id);
+            window.cart.add(productId);
+            updateCartCount();
+          });
+        });
+      }
+
+      function updateCartCount() {
+        const cartCount = document.querySelector('.cart-count');
+        cartCount.textContent = window.cart.items.length;
+      }
+
+      function applyFilters() {
+        const selectedCategories = [...categoryFilter.querySelectorAll('input:checked')].map(input => input.value);
+        const selectedBrands = [...brandFilter.querySelectorAll('input:checked')].map(input => input.value);
+
+        filteredProducts = products.filter(product => {
+          const categoryMatch = selectedCategories.length === 0 || selectedCategories.includes(product.category);
+          const brandMatch = selectedBrands.length === 0 || selectedBrands.includes(product.brand);
+          return categoryMatch && brandMatch;
+        });
+
+        const sortBy = sortSelect.value;
+        if (sortBy === 'price-asc') {
+          filteredProducts.sort((a, b) => a.price - b.price);
+        } else if (sortBy === 'price-desc') {
+          filteredProducts.sort((a, b) => b.price - a.price);
+        } else if (sortBy === 'rating-desc') {
+          filteredProducts.sort((a, b) => b.rating - a.rating);
+        }
+
+        renderProducts();
+      }
+
+      function createCategoryFilters() {
+        const categories = [...new Set(products.map(p => p.category))];
+        categories.forEach(category => {
+          const checkbox = document.createElement('div');
+          checkbox.innerHTML = `<input type="checkbox" id="${category}" value="${category}"><label for="${category}">${category}</label>`;
+          categoryFilter.appendChild(checkbox);
+        });
+      }
+
+      function createBrandFilters() {
+        const brands = [...new Set(products.map(p => p.brand))];
+        brands.forEach(brand => {
+          const checkbox = document.createElement('div');
+          checkbox.innerHTML = `<input type="checkbox" id="${brand}" value="${brand}"><label for="${brand}">${brand}</label>`;
+          brandFilter.appendChild(checkbox);
+        });
+      }
+
+      createCategoryFilters();
+      createBrandFilters();
+      renderProducts();
+      updateCartCount();
+
+      sortSelect.addEventListener('change', applyFilters);
+      categoryFilter.addEventListener('change', applyFilters);
+      brandFilter.addEventListener('change', applyFilters);
+    });
+  </script>
+
+</body>
+</html>

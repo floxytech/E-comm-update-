@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Profile - Caperone</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="page-profile">
+
+  <div class="container">
+    <header class="header">
+      <div class="brand">
+        <div class="logo">C</div>
+        <a href="index.html" class="site-title">Caperone</a>
+      </div>
+      <nav class="nav">
+        <a href="index.html">Home</a>
+        <a href="products.html">Products</a>
+        <a href="order.html">Order</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+      <div class="user-actions">
+      </div>
+    </header>
+
+    <section class="profile">
+      <h1>My Profile</h1>
+      <div class="profile-details">
+        <p><strong>Name:</strong> <span id="user-name"></span></p>
+        <p><strong>Email:</strong> <span id="user-email"></span></p>
+      </div>
+
+      <h2>My Orders</h2>
+      <div class="order-history">
+      </div>
+
+      <h2>My Wishlist</h2>
+      <div class="wishlist-grid">
+      </div>
+    </section>
+
+  </div>
+
+  <footer class="site-footer">
+    <div>&copy; 2025 Caperone. All Rights Reserved.</div>
+    <div class="links">
+      <a href="index.html">Home</a>
+      <a href="products.html">Products</a>
+    </div>
+  </footer>
+
+  <script src="cart.js"></script>
+  <script src="user.js"></script>
+  <script>
+    const userActions = document.querySelector('.user-actions');
+    const currentUser = window.user.getCurrentUser();
+
+    if (currentUser) {
+      userActions.innerHTML = `
+        <span>Welcome, ${currentUser.name}</span>
+        <a href="profile.html">Profile</a>
+        <a href="#" id="logout">Log Out</a>
+      `;
+      document.getElementById('logout').addEventListener('click', () => {
+        window.user.logout();
+        window.location.href = 'index.html';
+      });
+
+      document.getElementById('user-name').textContent = currentUser.name;
+      document.getElementById('user-email').textContent = currentUser.email;
+
+      const wishlistGrid = document.querySelector('.wishlist-grid');
+      currentUser.wishlist.forEach(productId => {
+        const product = products.find(p => p.id === productId);
+        if (product) {
+          const card = document.createElement('div');
+          card.classList.add('card');
+          card.innerHTML = `
+            <a href="product-details.html?id=${product.id}">
+              <img src="${product.image}" alt="${product.name}" />
+            </a>
+            <div class="title">${product.name}</div>
+            <div class="price">$${product.price.toFixed(2)}</div>
+            <div class="meta">
+              <button class="btn primary remove-from-wishlist" data-id="${product.id}">Remove</button>
+            </div>
+          `;
+          wishlistGrid.appendChild(card);
+        }
+      });
+
+      const removeFromWishlistButtons = document.querySelectorAll('.remove-from-wishlist');
+      removeFromWishlistButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          const productId = parseInt(button.dataset.id);
+          window.user.removeFromWishlist(productId);
+          window.location.reload();
+        });
+      });
+
+    } else {
+      window.location.href = 'login.html';
+    }
+  </script>
+
+</body>
+</html>

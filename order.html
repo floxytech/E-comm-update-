@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Order - Caperone</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="page-order">
+
+  <div class="container">
+    <header class="header">
+      <div class="brand">
+        <div class="logo">C</div>
+        <a href="index.html" class="site-title">Caperone</a>
+      </div>
+      <nav class="nav">
+        <a href="index.html">Home</a>
+        <a href="products.html">Products</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+      <div class="user-actions">
+      </div>
+    </header>
+
+    <section class="order-form">
+      <h1>Place Your Order</h1>
+      <p>Complete the form below to finalize your purchase. We'll get back to you shortly.</p>
+
+      <div class="order-content">
+        <div class="form-section">
+          <form action="https://formsubmit.co/kennmuasya49@gmail.com" method="POST">
+            <input type="hidden" name="_subject" value="New Order from Caperone Website">
+            
+            <h3>Contact Information</h3>
+            <div class="form-row">
+              <div class="form-col">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" name="name" required />
+              </div>
+              <div class="form-col">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" required />
+              </div>
+            </div>
+
+            <h3>Shipping Address</h3>
+            <div class="form-row">
+              <div class="form-col">
+                <label for="address">Address</label>
+                <input type="text" id="address" name="address" required />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-col">
+                <label for="city">City</label>
+                <input type="text" id="city" name="city" required />
+              </div>
+              <div class="form-col">
+                <label for="state">State</label>
+                <input type="text" id="state" name="state" required />
+              </div>
+              <div class="form-col">
+                <label for="zip">Zip Code</label>
+                <input type="text" id="zip" name="zip" required />
+              </div>
+            </div>
+
+            <h3>Shipping Method</h3>
+            <div class="shipping-options">
+              <div class="shipping-option">
+                <input type="radio" id="standard" name="shipping" value="5" checked>
+                <label for="standard">Standard Shipping (5-7 business days) - $5.00</label>
+              </div>
+              <div class="shipping-option">
+                <input type="radio" id="express" name="shipping" value="15">
+                <label for="express">Express Shipping (2-3 business days) - $15.00</label>
+              </div>
+            </div>
+
+            <h3>Payment Information</h3>
+            <div class="form-row">
+              <div class="form-col">
+                <label for="card-number">Card Number</label>
+                <input type="text" id="card-number" name="card-number" required />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-col">
+                <label for="card-name">Name on Card</label>
+                <input type="text" id="card-name" name="card-name" required />
+              </div>
+              <div class="form-col">
+                <label for="expiry-date">Expiry Date (MM/YY)</label>
+                <input type="text" id="expiry-date" name="expiry-date" required />
+              </div>
+              <div class="form-col">
+                <label for="cvv">CVV</label>
+                <input type="text" id="cvv" name="cvv" required />
+              </div>
+            </div>
+
+            <button type="submit" class="btn primary">Place Order</button>
+          </form>
+        </div>
+
+        <div class="order-summary">
+          <h3>Order Summary</h3>
+          <div class="cart-items"></div>
+          <div class="summary-row">
+            <span>Subtotal</span>
+            <span class="subtotal">$0.00</span>
+          </div>
+          <div class="summary-row">
+            <span>Shipping</span>
+            <span class="shipping">$5.00</span>
+          </div>
+          <div class="summary-row total">
+            <span>Total</span>
+            <span class="total-amount">$5.00</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <footer class="site-footer">
+    <div>&copy; 2025 Caperone. All Rights Reserved.</div>
+    <div class="links">
+      <a href="index.html">Home</a>
+      <a href="products.html">Products</a>
+    </div>
+  </footer>
+
+  <script src="cart.js"></script>
+  <script src="user.js"></script>
+  <script>
+    const userActions = document.querySelector('.user-actions');
+    const currentUser = window.user.getCurrentUser();
+
+    if (currentUser) {
+      userActions.innerHTML = `
+        <span>Welcome, ${currentUser.name}</span>
+        <a href="profile.html">Profile</a>
+        <a href="#" id="logout">Log Out</a>
+      `;
+      document.getElementById('logout').addEventListener('click', () => {
+        window.user.logout();
+        window.location.reload();
+      });
+    } else {
+      userActions.innerHTML = `
+        <a href="login.html" class="btn ghost">Log In</a>
+        <a href="signup.html" class="btn primary">Sign Up</a>
+      `;
+    }
+
+    function waitForCart() {
+      return new Promise(resolve => {
+        const interval = setInterval(() => {
+          if (window.cart) {
+            clearInterval(interval);
+            resolve();
+          }
+        }, 100);
+      });
+    }
+
+    waitForCart().then(() => {
+        const cartItemsContainer = document.querySelector('.cart-items');
+        const subtotalElement = document.querySelector('.subtotal');
+        const shippingElement = document.querySelector('.shipping');
+        const totalAmountElement = document.querySelector('.total-amount');
+        const shippingOptions = document.querySelectorAll('input[name="shipping"]');
+        const cartCount = document.querySelector('.cart-count');
+
+        function renderCart() {
+            cartItemsContainer.innerHTML = '';
+            window.cart.items.forEach(item => {
+            const cartItem = document.createElement('div');
+            cartItem.classList.add('cart-item');
+            cartItem.innerHTML = `
+                <img src="${item.image}" alt="${item.name}">
+                <div class="item-details">
+                <div class="item-name">${item.name}</div>
+                <div class="item-price">$${item.price.toFixed(2)}</div>
+                </div>
+                <div class="item-quantity">x ${item.quantity}</div>
+            `;
+            cartItemsContainer.appendChild(cartItem);
+            });
+
+            updateCartTotals();
+            updateCartCount();
+        }
+
+        function updateCartTotals() {
+            const subtotal = window.cart.getTotal();
+            const shipping = parseFloat(document.querySelector('input[name="shipping"]:checked').value);
+            const total = subtotal + shipping;
+
+            subtotalElement.textContent = `$${subtotal.toFixed(2)}`;
+            shippingElement.textContent = `$${shipping.toFixed(2)}`;
+            totalAmountElement.textContent = `$${total.toFixed(2)}`;
+        }
+
+        function updateCartCount() {
+            const cartCount = document.querySelector('.cart-count');
+            cartCount.textContent = window.cart.items.length;
+        }
+
+        shippingOptions.forEach(option => {
+            option.addEventListener('change', () => {
+            updateCartTotals();
+            });
+        });
+
+        renderCart();
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Product Details - Caperone</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="page-product-details">
+
+  <div class="container">
+    <header class="header">
+      <div class="brand">
+        <div class="logo">C</div>
+        <a href="index.html" class="site-title">Caperone</a>
+      </div>
+      <nav class="nav">
+        <a href="index.html">Home</a>
+        <a href="products.html">Products</a>
+        <a href="order.html">Order</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+      <div class="user-actions">
+      </div>
+    </header>
+
+    <section class="product-details">
+      <div class="product-image">
+        <img src="" alt="Product Image">
+      </div>
+      <div class="product-info">
+        <h1 class="product-name"></h1>
+        <div class="product-price"></div>
+        <p class="product-description"></p>
+        <button class="btn primary add-to-cart">Add to Cart</button>
+        <button class="btn ghost add-to-wishlist">Add to Wishlist</button>
+      </div>
+    </section>
+
+    <section class="reviews">
+      <h2>Reviews</h2>
+      <div class="review-summary">
+        <div class="average-rating"></div>
+        <div class="total-reviews"></div>
+      </div>
+      <div class="review-list"></div>
+      <form id="review-form">
+        <h3>Write a Review</h3>
+        <div class="form-row">
+          <div class="form-col">
+            <label for="rating">Rating:</label>
+            <select id="rating" name="rating">
+              <option value="5">5 Stars</option>
+              <option value="4">4 Stars</option>
+              <option value="3">3 Stars</option>
+              <option value="2">2 Stars</option>
+              <option value="1">1 Star</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-col">
+            <label for="review-text">Review:</label>
+            <textarea id="review-text" name="review-text" required></textarea>
+          </div>
+        </div>
+        <button type="submit" class="btn primary">Submit Review</button>
+      </form>
+    </section>
+
+    <section class="suggested-products">
+      <h2>Suggested Products</h2>
+      <div class="grid"></div>
+    </section>
+
+  </div>
+
+  <footer class="site-footer">
+    <div>&copy; 2025 Caperone. All Rights Reserved.</div>
+    <div class="links">
+      <a href="index.html">Home</a>
+      <a href="products.html">Products</a>
+    </div>
+  </footer>
+
+  <script src="cart.js"></script>
+  <script src="user.js"></script>
+  <script src="reviews.js"></script>
+  <script src="product-details.js"></script>
+  <script>
+    const userActions = document.querySelector('.user-actions');
+    const currentUser = window.user.getCurrentUser();
+
+    if (currentUser) {
+      userActions.innerHTML = `
+        <span>Welcome, ${currentUser.name}</span>
+        <a href="profile.html">Profile</a>
+        <a href="#" id="logout">Log Out</a>
+      `;
+      document.getElementById('logout').addEventListener('click', () => {
+        window.user.logout();
+        window.location.reload();
+      });
+    } else {
+      userActions.innerHTML = `
+        <a href="login.html" class="btn ghost">Log In</a>
+        <a href="signup.html" class="btn primary">Sign Up</a>
+      `;
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const productId = parseInt(urlParams.get('id'));
+
+    const addToWishlistButton = document.querySelector('.add-to-wishlist');
+    addToWishlistButton.addEventListener('click', () => {
+        window.user.addToWishlist(productId);
+    });
+
+  </script>
+
+</body>
+</html>
